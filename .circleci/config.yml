@@ -118,7 +118,7 @@ jobs:
 
   scan-backend:
     docker:
-      - image: cimg/node:13.8.0
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - run:
@@ -127,7 +127,7 @@ jobs:
             cd backend
             npm install
             npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical --force
+            npm audit --audit-level=critical 
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical --force
 
