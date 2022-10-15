@@ -266,7 +266,7 @@ cleanup:
             
 
 workflows:
-  default:
+  Project3:
     jobs:
       - build-frontend
       - build-backend
