@@ -134,6 +134,7 @@ jobs:
           channel: devops-notification
           event: fail
           template: basic_fail_1    
+          when: on_fail
       - slack/notify on pass:
           channel: devops-notification
           event: pass
