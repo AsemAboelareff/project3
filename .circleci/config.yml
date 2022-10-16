@@ -138,7 +138,8 @@ jobs:
       - slack/notify on pass:
           channel: devops-notification
           event: pass
-          template: success_tagged_deploy_1      
+          template: success_tagged_deploy_1 
+          when: on_pass     
 
 #   deploy-infrastructure:
 #     docker:
