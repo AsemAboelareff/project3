@@ -130,16 +130,16 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - slack/notify on fail:
+      - slack/notify:
           channel: devops-notification
           event: fail
           template: basic_fail_1    
           when: on_fail
-      - slack/notify on pass:
+      - slack/notify:
           channel: devops-notification
           event: pass
           template: success_tagged_deploy_1 
-          when: on_pass     
+              
 
 #   deploy-infrastructure:
 #     docker:
