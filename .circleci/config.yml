@@ -181,7 +181,7 @@ jobs:
           command: |      
               aws ec2 describe-instances \
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                --filters "Name=tag:Name,Values=backend" \
+                --filters "Name=tag:Name,Values=backend_${CIRCLE_WORKFLOW_ID:0:7}" \
                 --output text >> ~/project/.circleci/ansible/inventory.txt
       - run:
           name: cat inventory1
@@ -417,7 +417,7 @@ workflows:
             - build-backend
       - scan-backend:
           requires: 
-            - test-backend
+            - build-backend
       - scan-frontend:
           requires: 
             - build-frontend
