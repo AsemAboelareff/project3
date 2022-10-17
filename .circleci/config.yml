@@ -38,7 +38,7 @@ commands:
 jobs:
   build-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -49,14 +49,13 @@ jobs:
             cd frontend
             npm install
             npm run build
-#            exit 1
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
 
   build-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -67,14 +66,13 @@ jobs:
             cd backend
             npm install
             npm run build
-#             exit 1
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
 
   test-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -91,7 +89,7 @@ jobs:
                 
   test-backend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -108,9 +106,11 @@ jobs:
             
   scan-frontend:
     docker:
-      - image: circleci/node:13.8.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys: [frontend-test]
       - run:
           name: Front-end scan
           command: |
@@ -118,12 +118,17 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical --force
+      - save_cache:
+          paths: [frontend/node_modules]
+          key: frontend-test      
 
   scan-backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
+      - restore_cache:
+          keys: [backend-build]
       - run:
           name: Back-end scan
           command: |
@@ -132,6 +137,9 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-test      
       - slack/notify:
           channel: devops-notification
           event: fail
@@ -190,11 +198,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-            fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
-      # - run:
-      #       name: Install Ansible
-      #       command: |
-      #         apk add --update ansible 
+            fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"]  
       - run:
           name: Install AWS CLI v2
           command: |
@@ -213,22 +217,28 @@ jobs:
               ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml
       - destroy-environment       
 
-#   run-migrations:
-#     docker:
-#       # Docker image here that supports NodeJS
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Run migrations
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Send migration results to memstash
-#           command: |
-#             # Your code here
-#             exit 1
-#      # Here's where you will add some code to rollback on failure      
+  run-migrations:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: Run migrations
+          command: |
+              cd backend
+              npm install
+              # Run and save the migration output
+              npm run migrations > migrations_dump.txt
+
+      - run:
+          name: Send migration status to kvdb.io OR memstash.io
+          command: |   
+              if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+              then
+                  curl https://kvdb.io/YMJPXS3BiKGhR5NCdeLYw7/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              fi
+      - destroy-environment
+      - revert-migrations
 
 #   deploy-frontend:
 #     docker:
@@ -329,23 +339,23 @@ jobs:
 workflows:
   Project3:
     jobs:
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      - deploy-infrastructure
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      # - deploy-infrastructure
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
       #       branches:
       #         only: [test-feature-branch]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
