@@ -168,10 +168,14 @@ jobs:
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
                 --filters "Name=tag:Name,Values=backend" \
                 --output text >> ~/project/.circleci/ansible/inventory.txt
+      - run:
+          name: cat inventory
+          command: cat ~/project/.circleci/ansible/inventory.txt          
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+      
       # Here's where you will add some code to rollback on failure      
 
 #   configure-infrastructure:
