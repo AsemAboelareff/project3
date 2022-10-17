@@ -191,13 +191,13 @@ jobs:
       - checkout
       - add_ssh_keys:
             fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
-        - run:
+      - run:
             name: Install Ansible
             command: |
               apk add --update ansible 
-        - attach_workspace:
+      - attach_workspace:
             at: ~/     
-        - run:
+      - run:
             name: Run Playbook and Configure server
             command: | 
               ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml
