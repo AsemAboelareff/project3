@@ -279,8 +279,11 @@ jobs:
                 --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install      
       - run:
           name: Deploy frontend objects
           command: |
@@ -289,24 +292,42 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      # Here's where you will add some code to rollback on failure      
+      - destroy-environment
+      - revert-migrations      
                     
-#   deploy-backend:
-#     docker:
-#       # Docker image here that supports Ansible
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Deploy backend
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  deploy-backend:
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - add_ssh_keys:
+            fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"]
+      - attach_workspace:
+            at: ~/  
+      - run:
+          name: Install Ansible
+          command: |
+            python3 -m pip install --user ansible         
+      - run:
+            name: Run Playbook and Configure server
+            command: | 
+              ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
+
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm run build
+            cd backend
+            tar -czf artifact.tar.gz dist/* package*
+            cd .circleci
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - destroy-environment
+      - revert-migrations  
 
 #   smoke-test:
 #     docker:
