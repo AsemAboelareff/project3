@@ -191,10 +191,20 @@ jobs:
       - checkout
       - add_ssh_keys:
             fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
+      # - run:
+      #       name: Install Ansible
+      #       command: |
+      #         apk add --update ansible 
       - run:
-            name: Install Ansible
-            command: |
-              apk add --update ansible 
+        name: Install AWS CLI v2
+        command: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+      - run:
+        name: Install Ansible
+        command: |
+          python3 -m pip install --user ansible    
       - attach_workspace:
             at: ~/     
       - run:
