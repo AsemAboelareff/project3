@@ -100,9 +100,9 @@ jobs:
             cd backend
             npm install
             npm run test
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-test      
+      # - save_cache:
+      #     paths: [backend/node_modules]
+      #     key: backend-test      
             
   scan-frontend:
     docker:
@@ -137,9 +137,9 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-test      
+      # - save_cache:
+      #     paths: [backend/node_modules]
+      #     key: backend-test      
       - slack/notify:
           channel: devops-notification
           event: fail
@@ -222,6 +222,12 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - restore_cache:
           keys: [backend-build]
       - run:
