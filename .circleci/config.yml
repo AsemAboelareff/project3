@@ -169,7 +169,7 @@ jobs:
                 --filters "Name=tag:Name,Values=backend" \
                 --output text >> ~/project/.circleci/ansible/inventory.txt
       - run:
-          name: cat inventory
+          name: cat inventory1
           command: cat ~/project/.circleci/ansible/inventory.txt          
       - persist_to_workspace:
           root: ~/
