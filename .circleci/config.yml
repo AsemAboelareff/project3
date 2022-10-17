@@ -307,6 +307,8 @@ jobs:
       - checkout
       - add_ssh_keys:
             fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
+      - restore_cache:
+          keys: [backend-node]      
       - run:
           name: Install AWS CLI v2
           command: |
@@ -316,7 +318,14 @@ jobs:
       - run:
           name: Install Ansible
           command: |
-            python3 -m pip install --user ansible         
+            python3 -m pip install --user ansible    
+      - run:
+          name: Install Node.js 13.8.0
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt install -y nodejs
+            sudo npm install --global n
+            sudo n 13.8.0           
       - attach_workspace:
             at: ~/     
       - run:
