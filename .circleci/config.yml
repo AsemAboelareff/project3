@@ -17,16 +17,25 @@ commands:
              aws cloudformation delete-stack --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"           
 
   revert-migrations:
-    description: Revert the last migration
+    description: Revert the last migration, if any were executed during the current workflow
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
-            cd ~/project/backend
-            npm install
-            npm run build
-            npm run migrations:revert
+            SUCCESS=$(curl --insecure  https://kvdb.io/${KVDB_BUCKET}/migration_<< parameters.Workflow_ID >>)
+
+            # Logic for reverting the database state
+            if (( $SUCCESS == 1 ));
+            then
+              cd ~/project/backend
+              npm install
+              npm run migration:revert
+            fi
             
 jobs:
   build-frontend:
