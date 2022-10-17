@@ -44,7 +44,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [frontend-node]
       - run:
           name: Build front-end
           command: |
@@ -53,7 +53,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-build
+          key: frontend-node
 
   build-backend:
     docker:
@@ -61,7 +61,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-node]
       - run:
           name: Back-end build
           command: |
@@ -70,7 +70,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-build
+          key: backend-node
 
   test-frontend:
     docker:
@@ -78,7 +78,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-test]
+          keys: [frontend-node]
       - run:
           name: front-end test
           command: |
@@ -87,7 +87,7 @@ jobs:
             npm run test
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-test      
+          key: frontend-node      
                 
   test-backend:
     docker:
@@ -95,16 +95,16 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-test]
+          keys: [backend-node]
       - run:
           name: Back-end test
           command: |
             cd backend
             npm install
             npm run test
-      # - save_cache:
-      #     paths: [backend/node_modules]
-      #     key: backend-test      
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-node      
             
   scan-frontend:
     docker:
@@ -112,7 +112,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-test]
+          keys: [frontend-node]
       - run:
           name: Front-end scan
           command: |
@@ -122,7 +122,7 @@ jobs:
             npm audit --audit-level=critical --force
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-test      
+          key: frontend-node      
 
   scan-backend:
     docker:
@@ -130,7 +130,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-node]
       - run:
           name: Back-end scan
           command: |
@@ -139,9 +139,9 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
-      # - save_cache:
-      #     paths: [backend/node_modules]
-      #     key: backend-test      
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-node      
       - slack/notify:
           channel: devops-notification
           event: fail
@@ -230,15 +230,15 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-      # - restore_cache:
-      #     keys: [backend-build]
-      # - run:
-      #     name: Install Node.js 13.8.0
-      #     command: |
-      #       curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-      #       sudo apt install -y nodejs
-      #       sudo npm install --global n
-      #       sudo n 13.8.0    
+      - restore_cache:
+          keys: [backend-node]
+      - run:
+          name: Install Node.js 13.8.0
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt install -y nodejs
+            sudo npm install --global n
+            sudo n 13.8.0    
       - run:
           name: Run migrations
           command: |
@@ -267,9 +267,12 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
       - run:
-          name: Install Ansible
+          name: Install Node.js 13.8.0
           command: |
-            python3 -m pip install --user ansible
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+            sudo apt install -y nodejs
+            sudo npm install --global n
+            sudo n 13.8.0
       - run:
           name: Get backend url
           command: |
@@ -280,7 +283,7 @@ jobs:
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
       - restore_cache:
-          keys: [frontend-test]      
+          keys: [frontend-node]      
       - run:
           name: Install dependencies
           command: |
@@ -299,7 +302,7 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: cimg/node:13.8.0
+      - image: cimg/python:3.10
     steps:
       - checkout
       - add_ssh_keys:
