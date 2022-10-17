@@ -308,7 +308,9 @@ jobs:
       - add_ssh_keys:
             fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
       - restore_cache:
-          keys: [backend-node]      
+          keys: [backend-node]   
+      - attach_workspace:
+            at: ~/       
       - run:
           name: Install AWS CLI v2
           command: |
@@ -326,8 +328,7 @@ jobs:
             sudo apt install -y nodejs
             sudo npm install --global n
             sudo n 13.8.0           
-      - attach_workspace:
-            at: ~/     
+           
       - run:
             name: Run Playbook and Configure server
             command: | 

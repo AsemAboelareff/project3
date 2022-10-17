@@ -36,4 +36,4 @@ Resources:
       ImageId: ami-068663a3c619dd892 
       Tags:
         - Key: Name
-          Value: backend_${CIRCLE_WORKFLOW_ID:0:7}
+          Value: backend_${ID}
