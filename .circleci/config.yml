@@ -53,7 +53,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-node
+          key: frontend-build
 
   build-backend:
     docker:
@@ -70,7 +70,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-node
+          key: backend-build
 
   test-frontend:
     docker:
@@ -78,7 +78,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-node]
+          keys: [frontend-build]
       - run:
           name: front-end test
           command: |
@@ -87,7 +87,7 @@ jobs:
             npm run test
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-node      
+          key: frontend-test      
                 
   test-backend:
     docker:
@@ -95,7 +95,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-node]
+          keys: [backend-build]
       - run:
           name: Back-end test
           command: |
@@ -104,7 +104,7 @@ jobs:
             npm run test
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-node      
+          key: backend-test      
             
   scan-frontend:
     docker:
@@ -112,7 +112,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-node]
+          keys: [frontend-test]
       - run:
           name: Front-end scan
           command: |
@@ -122,7 +122,7 @@ jobs:
             npm audit --audit-level=critical --force
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-node      
+          key: frontend-scan      
 
   scan-backend:
     docker:
@@ -130,7 +130,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-node]
+          keys: [backend-test]
       - run:
           name: Back-end scan
           command: |
@@ -141,7 +141,7 @@ jobs:
             npm audit --audit-level=critical
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-node      
+          key: backend-scan      
       - slack/notify:
           channel: devops-notification
           event: fail
@@ -231,7 +231,7 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
       - restore_cache:
-          keys: [backend-node]
+          keys: [backend-scan]
       - run:
           name: Install Node.js 13.8.0
           command: |
@@ -308,7 +308,7 @@ jobs:
       - add_ssh_keys:
             fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
       - restore_cache:
-          keys: [backend-node]   
+          keys: [backend-scan]   
       - attach_workspace:
             at: ~/       
       - run:
@@ -419,7 +419,7 @@ workflows:
             - test-backend
       - scan-frontend:
           requires: 
-            - test-frontend
+            - build-frontend
       - deploy-infrastructure:
           requires: 
             - test-frontend
