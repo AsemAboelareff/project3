@@ -275,10 +275,12 @@ jobs:
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances \
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                --filters "Name=tag:Name,Values=backend" \
+                --filters "Name=tag:Name,Values=backend_${CIRCLE_WORKFLOW_ID:0:7}" \
                 --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
+      - restore_cache:
+          keys: [frontend-test]      
       - run:
           name: Install dependencies
           command: |
@@ -297,26 +299,28 @@ jobs:
                     
   deploy-backend:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
-            fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"]
-      - attach_workspace:
-            at: ~/  
+            fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install      
       - run:
           name: Install Ansible
           command: |
             python3 -m pip install --user ansible         
+      - attach_workspace:
+            at: ~/     
       - run:
             name: Run Playbook and Configure server
             command: | 
-              ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
+              ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml
 
-      - run:
-          name: Install dependencies
-          command: |
-            # your code here
       - run:
           name: Deploy backend
           command: |
