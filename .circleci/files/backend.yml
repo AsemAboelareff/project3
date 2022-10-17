@@ -36,4 +36,4 @@ Resources:
       ImageId: ami-068663a3c619dd892 
       Tags:
         - Key: Name
-          Value: backend_${ID}
+          Value: !Sub backend_${ID}

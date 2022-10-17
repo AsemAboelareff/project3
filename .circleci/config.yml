@@ -82,7 +82,7 @@ jobs:
       - run:
           name: front-end test
           command: |
-            cd backend
+            cd frontend
             npm install
             npm run test
       - save_cache:
@@ -339,7 +339,6 @@ jobs:
           command: |
             cd backend
             npm run build
-            cd backend
             tar -czf artifact.tar.gz dist/* package*
             cd .circleci
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
@@ -417,10 +416,10 @@ workflows:
             - build-backend
       - scan-backend:
           requires: 
-            - build-backend
+            - test-backend
       - scan-frontend:
           requires: 
-            - build-frontend
+            - test-frontend
       - deploy-infrastructure:
           requires: 
             - test-frontend
