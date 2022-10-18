@@ -268,6 +268,7 @@ jobs:
     docker:
       - image: cimg/python:3.10
     steps:
+      - checkout   
       - run:
           name: Install AWS CLI v2
           command: |
@@ -349,9 +350,9 @@ jobs:
             npm i
             npm run build
             cd ..
-            tar -czf artifact.tar.gz dist/* package*
+            tar -czf artifact.tar.gz backend/dist/* backend/package*
             cd .circleci
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+            cp artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
             name: Run Playbook and Configure server
             command: | 
