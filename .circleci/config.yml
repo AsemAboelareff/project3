@@ -238,13 +238,13 @@ jobs:
             sudo ./aws/install
       # - restore_cache:
       #     keys: [backend-scan]
-      - run:
-          name: Install Node.js 13.8.0
-          command: |
-            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-            sudo apt install -y nodejs
-            sudo npm install --global n
-            sudo n 13.8.0    
+      # - run:
+      #     name: Install Node.js 13.8.0
+      #     command: |
+      #       curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+      #       sudo apt install -y nodejs
+      #       sudo npm install --global n
+      #       sudo n 13.8.0    
       - run:
           name: Run migrations
           command: |
@@ -266,10 +266,6 @@ jobs:
     docker:
       - image: cimg/python:3.10
     steps:
-      - restore_cache:
-          keys: [frontend-check]
-      - attach_workspace:
-            at: ~/      
       - run:
           name: Install AWS CLI v2
           command: |
@@ -282,7 +278,14 @@ jobs:
             curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
             sudo apt install -y nodejs
             sudo npm install --global n
-            sudo n 13.8.0
+            sudo n 13.8.0            
+      - restore_cache:
+          keys: [frontend-check]   
+      - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install    
       - run:
           name: Get backend url
           command: |
@@ -290,21 +293,12 @@ jobs:
                 --query 'Reservations[*].Instances[*].PublicIpAddress' \
                 --filters "Name=tag:Name,Values=backend_${CIRCLE_WORKFLOW_ID:0:7}" \
                 --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
-            
-      - run:
-          name: Install dependencies
-          command: |
-            cd frontend
-            npm install      
+            echo "API_URL=http://${BACKEND_PUBLIC_IP}:3030" >> frontend/.env
+            cat frontend/.env      
       - run:
           name: Deploy frontend objects
           command: |
             cd frontend
-            npm install
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
@@ -316,18 +310,12 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
-      - add_ssh_keys:
-            fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"] 
-      - restore_cache:
-          keys: [backend-check]   
-      - attach_workspace:
-            at: ~/       
       - run:
           name: Install AWS CLI v2
           command: |
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
-            sudo ./aws/install      
+            sudo ./aws/install 
       - run:
           name: Install Ansible
           command: |
@@ -338,8 +326,18 @@ jobs:
             curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
             sudo apt install -y nodejs
             sudo npm install --global n
-            sudo n 13.8.0           
-           
+            sudo n 13.8.0       
+      - add_ssh_keys:
+            fingerprints: ["58:66:06:90:9d:83:75:5e:e3:06:b2:ac:96:b8:7c:46"]
+      - attach_workspace:
+            at: ~/       
+      - restore_cache:
+          keys: [backend-check] 
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend
+            npm install          
       - run:
           name: Deploy backend
           command: |
