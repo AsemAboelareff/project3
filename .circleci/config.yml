@@ -311,6 +311,8 @@ jobs:
       - image: cimg/python:3.10
     steps:
       - checkout
+      - attach_workspace:
+            at: ~/
       - run:
           name: Install AWS CLI v2
           command: |
