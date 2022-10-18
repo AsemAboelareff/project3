@@ -9,7 +9,7 @@ commands:
            name: remove bucket
            when: on_fail
            command: |
-             aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive   
+             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive   
       - run:
            name: Destroy frontend
            when: on_fail
