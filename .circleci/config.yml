@@ -347,12 +347,10 @@ jobs:
           name: Deploy backend
           command: |
             cd backend
-            npm i
             npm run build
+            tar -czf artifact.tar.gz dist/* package*
             cd ..
-            tar -czf artifact.tar.gz backend/dist/* backend/package*
-            cd .circleci
-            cp artifact.tar.gz .circleci/ansible/roles/deploy/files
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
             name: Run Playbook and Configure server
             command: | 
