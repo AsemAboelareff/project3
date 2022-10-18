@@ -260,6 +260,10 @@ jobs:
     docker:
       - image: cimg/python:3.10
     steps:
+      - restore_cache:
+          keys: [frontend-scan]
+      - attach_workspace:
+            at: ~/      
       - run:
           name: Install AWS CLI v2
           command: |
@@ -282,8 +286,9 @@ jobs:
                 --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
-      - restore_cache:
-          keys: [frontend-node]      
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
+            
       - run:
           name: Install dependencies
           command: |
@@ -330,19 +335,20 @@ jobs:
             sudo n 13.8.0           
            
       - run:
-            name: Run Playbook and Configure server
-            command: | 
-              ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml
-
-      - run:
           name: Deploy backend
           command: |
             cd backend
+            npm i
             npm run build
             cd ..
             tar -czf artifact.tar.gz dist/* package*
             cd .circleci
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+      - run:
+            name: Run Playbook and Configure server
+            command: | 
+              ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
+      
       - destroy-environment
       - revert-migrations  
 
