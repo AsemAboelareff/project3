@@ -50,7 +50,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-check]
+          keys: [frontend-checks]
       - run:
           name: Build front-endkvd
           command: |
@@ -59,7 +59,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-check
+          key: frontend-checks
 
   build-backend:
     docker:
@@ -76,7 +76,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-check
+          key: backend-checks
 
   test-frontend:
     docker:
@@ -84,7 +84,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-check]
+          keys: [frontend-checks]
       - run:
           name: front-end test
           command: |
@@ -93,7 +93,7 @@ jobs:
             npm run test
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-check      
+          key: frontend-checks      
                 
   test-backend:
     docker:
@@ -101,7 +101,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-check]
+          keys: [backend-checks]
       - run:
           name: Back-end test
           command: |
@@ -110,7 +110,7 @@ jobs:
             npm run test
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-check      
+          key: backend-checks      
             
   scan-frontend:
     docker:
@@ -118,7 +118,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-check]
+          keys: [frontend-checks]
       - run:
           name: Front-end scan
           command: |
@@ -128,7 +128,7 @@ jobs:
             npm audit --audit-level=critical --force
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-check      
+          key: frontend-checks      
 
   scan-backend:
     docker:
@@ -136,7 +136,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-check]
+          keys: [backend-checks]
       - run:
           name: Back-end scan
           command: |
@@ -147,7 +147,7 @@ jobs:
             npm audit --audit-level=critical
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-check      
+          key: backend-checks      
       - slack/notify:
           channel: devops-notification
           event: fail
@@ -281,7 +281,7 @@ jobs:
             sudo npm install --global n
             sudo n 13.8.0            
       - restore_cache:
-          keys: [frontend-check]   
+          keys: [frontend-checks]   
       - run:
           name: Install dependencies
           command: |
@@ -335,7 +335,7 @@ jobs:
       - attach_workspace:
             at: ~/       
       - restore_cache:
-          keys: [backend-check] 
+          keys: [backend-checks] 
       - run:
           name: Install dependencies
           command: |
