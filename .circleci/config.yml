@@ -352,8 +352,10 @@ jobs:
             tar -czf artifact.tar.gz dist/* package*
             cd ..
             pwd
-            ls .
-            sudo cp ./backend/artifact.tar.gz ~/project/.circleci/ansible/roles/deploy/files
+            echo "asem"
+            ls bacend
+            echo "asem"
+            sudo cp ./backend/* ~/project/.circleci/ansible/roles/deploy/files
             echo "asem"
             ls ./backend
             echo "asem"
@@ -361,7 +363,8 @@ jobs:
             echo "asem"
             ls .circleci/ansible/roles/deploy/files
             echo "asem"
-            ls ~/project/.circleci/ansible/roles/deploy/files
+            cd ~/project/.circleci/ansible/roles/deploy/files
+            pwd
       - run:
             name: Run Playbook and Configure server
             command: |
