@@ -351,10 +351,10 @@ jobs:
             tar -czf artifact.tar.gz dist/* package*
             cd ..
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
+            file .circleci/ansible/roles/deploy/files/artifact.tar.gz
       - run:
             name: Run Playbook and Configure server
-            command: | 
-              cd .circleci/ansible
+            command: |
               ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
       
       # - destroy-environment
