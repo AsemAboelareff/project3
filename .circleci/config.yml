@@ -351,25 +351,13 @@ jobs:
             npm run build
             tar -czf artifact.tar.gz dist/* package*
             cd ..
-            pwd
-            echo "asem"
-            ls ./backend
-            echo "asem"
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-            echo "asem"
-            ls ./backend
-            echo "asem"
-            ls -l .circleci/ansible/roles/deploy/
-            echo "asem"
-            ls .circleci/ansible/roles/deploy/files
-            echo "asem"
-            cd ~/project/.circleci/ansible/roles/deploy/files
-            pwd
       - run:
             name: Run Playbook and Configure server
             command: |
               cd .circleci/ansible
               ls ./roles/deploy/files
+              cat ~/project/.circleci/ansible/inventory.txt
               ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
       
       - destroy-environment

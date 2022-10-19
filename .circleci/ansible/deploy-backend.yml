@@ -1,7 +1,6 @@
 ---
-
 - name: "configuration play." 
-  hosts: web
+  hosts: all
   become: true 
   become_method: sudo
   become_user: root 
