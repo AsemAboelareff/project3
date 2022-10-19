@@ -354,14 +354,16 @@ jobs:
             echo "asem"
             ls ./backend
             echo "asem"
-            ls ./.circleci/ansible/roles/deploy/files
+            ls .circleci/ansible/roles/deploy/files
+            echo "asem"
+            ls ~/project/.circleci/ansible/roles/deploy/files
       - run:
             name: Run Playbook and Configure server
             command: |
               ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
       
-      # - destroy-environment
-      # - revert-migrations  
+      - destroy-environment
+      - revert-migrations  
 
   smoke-test:
     docker:
