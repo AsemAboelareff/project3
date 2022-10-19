@@ -359,7 +359,7 @@ jobs:
             echo "asem"
             ls ./backend
             echo "asem"
-            ll .circleci/ansible/roles/deploy/
+            ls -l .circleci/ansible/roles/deploy/
             echo "asem"
             ls .circleci/ansible/roles/deploy/files
             echo "asem"
