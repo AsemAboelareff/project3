@@ -355,11 +355,11 @@ jobs:
             echo "asem"
             ls ./backend
             echo "asem"
-            sudo cp ./backend/* ~/project/.circleci/ansible/roles/deploy/files
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
             echo "asem"
             ls ./backend
             echo "asem"
-            ls .circleci/ansible/roles/deploy/
+            ll .circleci/ansible/roles/deploy/
             echo "asem"
             ls .circleci/ansible/roles/deploy/files
             echo "asem"
@@ -368,6 +368,8 @@ jobs:
       - run:
             name: Run Playbook and Configure server
             command: |
+              cd .circleci/ansible
+              ls ./roles/deploy/files
               ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
       
       - destroy-environment
