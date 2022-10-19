@@ -350,8 +350,11 @@ jobs:
             npm run build
             tar -czf artifact.tar.gz dist/* package*
             cd ..
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-            file .circleci/ansible/roles/deploy/files/artifact.tar.gz
+            cp ./backend/artifact.tar.gz ./.circleci/ansible/roles/deploy/files
+            echo "asem"
+            ls ./backend
+            echo "asem"
+            ls ./.circleci/ansible/roles/deploy/files
       - run:
             name: Run Playbook and Configure server
             command: |
