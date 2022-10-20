@@ -418,7 +418,7 @@ jobs:
 
   cloudfront-update:
     docker:
-      # Docker image here that supports AWS CLI
+      - image: cimg/python:3.10
     steps:
       - checkout
       - run:
