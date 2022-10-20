@@ -51,7 +51,10 @@ jobs:
       - checkout
       - run:
           name: env
-          command: echo $TYPEORM_CONNECTION
+          command: |
+          echo $TYPEORM_CONNECTION > tmp.txt
+          cat tmp.txt
+
       - restore_cache:
           keys: [frontend-checks]
       - run:
