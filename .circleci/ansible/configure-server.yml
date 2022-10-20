@@ -36,9 +36,9 @@
           TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
       register: execute_node
 
-- name: print message
-  debug:
-    msg: "{{ execute_node.stdout_lines }}"  
+    - name: print message
+      debug:
+        msg: "{{ execute_node.stdout_lines }}"  
 
   # # Get the environment variables from CircleCI and add to the EC2 instance
   # environment:
