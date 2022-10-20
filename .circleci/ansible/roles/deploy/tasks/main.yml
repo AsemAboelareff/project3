@@ -13,13 +13,6 @@
   shell: |
     cd /home/ubuntu/backend-app
     npm i   
-# - name: "Executing Node app with PM2"
-#   shell: |
-#     cd ~/backend-app/dist
-#     EXPORT 
-#     pm2 stop default
-#     pm2 start main.js
-
 - name: install ans start app
   command:  |
     npm install
@@ -39,34 +32,9 @@
       TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
       TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
   register: execute_node
-
 - name: print message
   debug:
-    msg: "{{ execute_node.stdout_lines }}"
-
-- name: env
-  command:  |
-    EXPORT TYPEORM_CONNECTION
-    echo $TYPEORM_CONNECTION 
-
-  args:
-    chdir: /home/ubuntu/backend-app/dist
-  environment:
-      ENVIRONMENT: production
-      TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION') }}"
-      TYPEORM_MIGRATIONS_DIR: "./migrations"
-      TYPEORM_MIGRATIONS: "./migrations/*.js"
-      TYPEORM_ENTITIES: "./modules/domain/**/*.entity.js"
-      TYPEORM_HOST: "{{ lookup('env', 'TYPEORM_HOST') }}"
-      TYPEORM_PORT: "{{ lookup('env', 'TYPEORM_PORT') }}"
-      TYPEORM_USERNAME: "{{ lookup('env', 'TYPEORM_USERNAME') }}"
-      TYPEORM_PASSWORD: "{{ lookup('env', 'TYPEORM_PASSWORD') }}"
-      TYPEORM_DATABASE: "{{ lookup('env', 'TYPEORM_DATABASE') }}"
-  register: execute_node1
-
-- name: print message1
-  debug:
-    msg: "{{ execute_node1.stdout_lines }}"    
+    msg: "{{ execute_node.stdout_lines }}"   
 - name: "Configure pm2 to start as service"
   shell: |
     env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
