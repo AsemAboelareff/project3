@@ -356,6 +356,9 @@ jobs:
       - run:
             name: Run Playbook and Configure server
             command: |
+              export TYPEORM_MIGRATIONS_DIR=./migrations
+              export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+              export TYPEORM_MIGRATIONS=./migrations/*.ts
               cd .circleci/ansible
               ls ./roles/deploy/files
               cat ~/project/.circleci/ansible/inventory.txt
