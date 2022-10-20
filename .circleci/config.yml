@@ -448,7 +448,7 @@ jobs:
                 --tags project=udapeople 
                
 
-cleanup:
+  cleanup:
     docker:
       - image: cimg/python:3.10
     steps:
