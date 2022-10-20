@@ -49,6 +49,9 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
+      - run:
+          name: env
+          command: echo $TYPEORM_CONNECTION
       - restore_cache:
           keys: [frontend-checks]
       - run:
@@ -452,38 +455,38 @@ workflows:
   Project3:
     jobs:
       - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: 
-            - build-frontend
-      - test-backend:
-          requires: 
-            - build-backend
-      - scan-backend:
-          requires: 
-            - build-backend
-      - scan-frontend:
-          requires: 
-            - build-frontend
-      - deploy-infrastructure:
-          requires: 
-            - test-frontend
-            - test-backend
-            - scan-frontend
-            - scan-backend
-          filters:
-            branches:
-              only: [master]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
+      # - build-backend
+      # - test-frontend:
+      #     requires: 
+      #       - build-frontend
+      # - test-backend:
+      #     requires: 
+      #       - build-backend
+      # - scan-backend:
+      #     requires: 
+      #       - build-backend
+      # - scan-frontend:
+      #     requires: 
+      #       - build-frontend
+      # - deploy-infrastructure:
+      #     requires: 
+      #       - test-frontend
+      #       - test-backend
+      #       - scan-frontend
+      #       - scan-backend
+      #     filters:
+      #       branches:
+      #         only: [master]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
