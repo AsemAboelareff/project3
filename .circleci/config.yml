@@ -49,113 +49,113 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-checks]
-      - run:
-          name: Build front-endkvd
-          command: |
-            cd frontend
-            npm install
-            npm run build
-      - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-checks
+      # - restore_cache:
+      #     keys: [frontend-checks]
+      # - run:
+      #     name: Build front-endkvd
+      #     command: |
+      #       cd frontend
+      #       npm install
+      #       npm run build
+      # - save_cache:
+      #     paths: [frontend/node_modules]
+      #     key: frontend-checks
 
   build-backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-cheeck]
-      - run:
-          name: Back-end build
-          command: |
-            cd backend
-            npm install
-            npm run build
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-checks
+      # - restore_cache:
+      #     keys: [backend-cheeck]
+      # - run:
+      #     name: Back-end build
+      #     command: |
+      #       cd backend
+      #       npm install
+      #       npm run build
+      # - save_cache:
+      #     paths: [backend/node_modules]
+      #     key: backend-checks
 
   test-frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-checks]
-      - run:
-          name: front-end test
-          command: |
-            cd frontend
-            npm install
-            npm run test
-      - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-checks      
+      # - restore_cache:
+      #     keys: [frontend-checks]
+      # - run:
+      #     name: front-end test
+      #     command: |
+      #       cd frontend
+      #       npm install
+      #       npm run test
+      # - save_cache:
+      #     paths: [frontend/node_modules]
+      #     key: frontend-checks      
                 
   test-backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-checks]
-      - run:
-          name: Back-end test
-          command: |
-            cd backend
-            npm install
-            npm run test
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-checks      
+      # - restore_cache:
+      #     keys: [backend-checks]
+      # - run:
+      #     name: Back-end test
+      #     command: |
+      #       cd backend
+      #       npm install
+      #       npm run test
+      # - save_cache:
+      #     paths: [backend/node_modules]
+      #     key: backend-checks      
             
   scan-frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-checks]
-      - run:
-          name: Front-end scan
-          command: |
-            cd frontend
-            npm install
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical --force
-      - save_cache:
-          paths: [frontend/node_modules]
-          key: frontend-checks      
+      # - restore_cache:
+      #     keys: [frontend-checks]
+      # - run:
+      #     name: Front-end scan
+      #     command: |
+      #       cd frontend
+      #       npm install
+      #       npm audit fix --audit-level=critical --force
+      #       npm audit --audit-level=critical --force
+      # - save_cache:
+      #     paths: [frontend/node_modules]
+      #     key: frontend-checks      
 
   scan-backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-checks]
-      - run:
-          name: Back-end scan
-          command: |
-            cd backend
-            npm install
-            npm audit fix --audit-level=critical --force
-            npm audit fix --audit-level=critical --force
-            npm audit --audit-level=critical
-      - save_cache:
-          paths: [backend/node_modules]
-          key: backend-checks      
-      - slack/notify:
-          channel: devops-notification
-          event: fail
-          template: basic_fail_1 
-      - slack/notify:
-          channel: devops-notification
-          event: pass
-          template: success_tagged_deploy_1 
+      # - restore_cache:
+      #     keys: [backend-checks]
+      # - run:
+      #     name: Back-end scan
+      #     command: |
+      #       cd backend
+      #       npm install
+      #       npm audit fix --audit-level=critical --force
+      #       npm audit fix --audit-level=critical --force
+      #       npm audit --audit-level=critical
+      # - save_cache:
+      #     paths: [backend/node_modules]
+      #     key: backend-checks      
+      # - slack/notify:
+      #     channel: devops-notification
+      #     event: fail
+      #     template: basic_fail_1 
+      # - slack/notify:
+      #     channel: devops-notification
+      #     event: pass
+      #     template: success_tagged_deploy_1 
               
   deploy-infrastructure:
     docker:
@@ -372,47 +372,47 @@ jobs:
       - image: cimg/python:3.10 
     steps:
       - checkout
-      - run:
-          name: Install AWS CLI v2
-          command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install 
-      - run:
-          name: Install Ansible
-          command: |
-            python3 -m pip install --user ansible    
-      - run:
-          name: Install Node.js 13.8.0
-          command: |
-            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-            sudo apt install -y nodejs
-            sudo npm install --global n
-            sudo n 13.8.0
-      - run:
-          name: Backend smoke test.
-          command: |
-            export BACKEND_IP=$(aws ec2 describe-instances \
-                --query 'Reservations[*].Instances[*].PublicIpAddress' \
-                --filters "Name=tag:Name,Values=backend_${CIRCLE_WORKFLOW_ID:0:7}" \
-                --output text)
-            echo ${BACKEND_IP}:3030/api/status    
-            if curl -s ${BACKEND_IP}:3030/api/status | grep "ok"
-            then
-              exit 0
-            else
-              exit 1
-            fi
-      - run:
-          name: Frontend smoke test.
-          command: |
-            FRONTEND_WEBSITE=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com
-            if curl -s $FRONTEND_WEBSITE | grep "Welcome"
-            then
-              exit 0
-            else
-              exit 1
-            fi
+      # - run:
+      #     name: Install AWS CLI v2
+      #     command: |
+      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      #       unzip awscliv2.zip
+      #       sudo ./aws/install 
+      # - run:
+      #     name: Install Ansible
+      #     command: |
+      #       python3 -m pip install --user ansible    
+      # - run:
+      #     name: Install Node.js 13.8.0
+      #     command: |
+      #       curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+      #       sudo apt install -y nodejs
+      #       sudo npm install --global n
+      #       sudo n 13.8.0
+      # - run:
+      #     name: Backend smoke test.
+      #     command: |
+      #       export BACKEND_IP=$(aws ec2 describe-instances \
+      #           --query 'Reservations[*].Instances[*].PublicIpAddress' \
+      #           --filters "Name=tag:Name,Values=backend_${CIRCLE_WORKFLOW_ID:0:7}" \
+      #           --output text)
+      #       echo ${BACKEND_IP}:3030/api/status    
+      #       if curl -s ${BACKEND_IP}:3030/api/status | grep "ok"
+      #       then
+      #         exit 0
+      #       else
+      #         exit 1
+      #       fi
+      # - run:
+      #     name: Frontend smoke test.
+      #     command: |
+      #       FRONTEND_WEBSITE=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com
+      #       if curl -s $FRONTEND_WEBSITE | grep "Welcome"
+      #       then
+      #         exit 0
+      #       else
+      #         exit 1
+      #       fi
       # - destroy-environment
       # - revert-migrations 
 
@@ -458,10 +458,10 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install 
-      - run:
-          name: Install Ansible
-          command: |
-            python3 -m pip install --user ansible  
+      # - run:
+      #     name: Install Ansible
+      #     command: |
+      #       python3 -m pip install --user ansible  
       - run:
           name: Get old stack workflow id
           command: |
